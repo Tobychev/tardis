@@ -302,4 +302,18 @@ def postprocess(model, runner):
     exptau = 1 - np.exp(- 
                         runner.line_lists_tau_sobolevs.reshape(-1,
                             model.tardis_config.structure["velocity"]["num"]) ) 
-    model.Edotlu = Edotlu_norm_factor*exptau*runner.Edotlu_estimator        
+    model.Edotlu = Edotlu_norm_factor*exptau*runner.Edotlu_estimator
+
+def estimate_level_absorption_rate(Edotlus,nlev,nshell,meta):
+    Edotu = np.zeros((nlev,nshell))
+    for k in range(nshell):
+        j = 0
+        while j < nlev:
+            Etemp = 0            
+            while i < meta.block_ref_ground[j] + meta.count_up[j]: # This works if block_ref_ground and count_up has repeaing entries
+                Etemp += Edotlus[i]
+                Edotu[j,k] = Etemp
+                ++j
+                ++i
+            i = meta.block_ref_ground[j+1]
+    return Edotu
